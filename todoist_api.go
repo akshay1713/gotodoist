@@ -60,7 +60,6 @@ func InitTodoistAPI(api_token string) TodoistAPI {
 }
 
 func apiResponseToMap(response *http.Response) map[string]interface{} {
-	fmt.Println(response)
 	response_body, _ := ioutil.ReadAll(response.Body)
 	response_body_map := make(map[string]interface{})
 	json.Unmarshal(response_body, &response_body_map)
