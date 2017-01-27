@@ -12,14 +12,16 @@ import (
 )
 
 type TodoistAPI struct {
-	Projects Projects
-	Items    Items
+	Projects    Projects
+	Items       Items
+	sync_object *SyncObject
 }
 
 type SyncObject struct {
-	token      string
-	url        string
-	sync_token string
+	token       string
+	url         string
+	sync_token  string
+	write_queue []Command
 }
 
 type Command struct {
@@ -51,11 +53,29 @@ func (sync SyncObject) callReadApi(resource_types []string) (*http.Response, err
 	return resp_new, err_new
 }
 
+func (sync *SyncObject) queueCommands(commands []Command) {
+	current_commands := sync.write_queue
+	updated_commands := append(current_commands, commands...)
+	sync.write_queue = updated_commands
+}
+
+func (todoist_api *TodoistAPI) Commit() (map[string]interface{}, error) {
+	commands := todoist_api.sync_object.write_queue
+	response, err := todoist_api.sync_object.callWriteApi(commands)
+	if err == nil {
+		commands = []Command{}
+		todoist_api.sync_object.write_queue = commands
+	}
+	response_map := apiResponseToMap(response)
+	return response_map, err
+}
+
 func InitTodoistAPI(api_token string) TodoistAPI {
-	sync_object := SyncObject{api_token, "https://todoist.com/API/v7/sync", "*"}
+	commands := []Command{}
+	sync_object := SyncObject{api_token, "https://todoist.com/API/v7/sync", "*", commands}
 	projects := Projects{&sync_object}
 	items := Items{&sync_object}
-	todoist_api := TodoistAPI{projects, items}
+	todoist_api := TodoistAPI{projects, items, &sync_object}
 	return todoist_api
 }
 
