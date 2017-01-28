@@ -6,6 +6,7 @@ type Items struct {
 
 func (items Items) Add(names []string, project_id int64) (map[string]interface{}, error) {
 	commands := []Command{}
+	name_temp_ids := map[string]string{}
 	for _, name := range names {
 		uuid, _ := newUUID()
 		temp_id, _ := newUUID()
@@ -18,9 +19,17 @@ func (items Items) Add(names []string, project_id int64) (map[string]interface{}
 				"project_id": project_id,
 			},
 		})
+		name_temp_ids[name] = temp_id
 	}
 	response, err := items.sync_object.callWriteApi(commands)
 	response_map := apiResponseToMap(response)
+	body := response_map["body"].(map[string]interface{})
+	id_mapping := body["temp_id_mapping"].(map[string]interface{})
+	name_ids := map[string]int64{}
+	for k, v := range name_temp_ids {
+		name_ids[k] = int64(id_mapping[v].(float64))
+	}
+	response_map["name_ids"] = name_ids
 	defer response.Body.Close()
 	return response_map, err
 }
