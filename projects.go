@@ -153,6 +153,41 @@ func (projects Projects) QueueUnshare(email string, project_id int64) {
 	projects.sync_object.queueCommands(commands)
 }
 
+func (projects Projects) AddNote(content string, project_id int64) (map[string]interface{}, error) {
+	commands := []Command{}
+	uuid, _ := newUUID()
+	temp_id, _ := newUUID()
+	commands = append(commands, Command{
+		Type:   "note_add",
+		UUID:   uuid,
+		TempID: temp_id,
+		Args: map[string]interface{}{
+			"content":    content,
+			"project_id": project_id,
+		},
+	})
+	response, err := projects.sync_object.callWriteApi(commands)
+	response_map := apiResponseToMap(response)
+	defer response.Body.Close()
+	return response_map, err
+}
+
+func (projects Projects) QueueAddNote(content string, project_id int64) {
+	commands := []Command{}
+	uuid, _ := newUUID()
+	temp_id, _ := newUUID()
+	commands = append(commands, Command{
+		Type:   "note_add",
+		UUID:   uuid,
+		TempID: temp_id,
+		Args: map[string]interface{}{
+			"content":    content,
+			"project_id": project_id,
+		},
+	})
+	projects.sync_object.queueCommands(commands)
+}
+
 func (projects Projects) GetAll() (map[string]interface{}, error) {
 	resource_types := []string{"projects"}
 	response, err := projects.sync_object.callReadApi(resource_types)

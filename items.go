@@ -177,6 +177,41 @@ func (items Items) QueueClose(item_id int64) {
 	items.sync_object.queueCommands(commands)
 }
 
+func (items Items) AddNote(content string, item_id int64) (map[string]interface{}, error) {
+	commands := []Command{}
+	uuid, _ := newUUID()
+	temp_id, _ := newUUID()
+	commands = append(commands, Command{
+		Type:   "note_add",
+		UUID:   uuid,
+		TempID: temp_id,
+		Args: map[string]interface{}{
+			"content": content,
+			"item_id": item_id,
+		},
+	})
+	response, err := items.sync_object.callWriteApi(commands)
+	response_map := apiResponseToMap(response)
+	defer response.Body.Close()
+	return response_map, err
+}
+
+func (items Items) QueueAddNote(content string, item_id int64) {
+	commands := []Command{}
+	uuid, _ := newUUID()
+	temp_id, _ := newUUID()
+	commands = append(commands, Command{
+		Type:   "note_add",
+		UUID:   uuid,
+		TempID: temp_id,
+		Args: map[string]interface{}{
+			"content": content,
+			"item_id": item_id,
+		},
+	})
+	items.sync_object.queueCommands(commands)
+}
+
 func (items Items) GetAll() (map[string]interface{}, error) {
 	resource_types := []string{"items"}
 	response, err := items.sync_object.callReadApi(resource_types)
