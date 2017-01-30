@@ -58,8 +58,7 @@ func (items Items) Delete(item_ids []int64) (map[string]interface{}, error) {
 			Type: "item_delete",
 			UUID: uuid,
 			Args: map[string]interface{}{
-				"content": item_ids,
-				"ids":     item_ids,
+				"ids": item_ids,
 			},
 		},
 	}
@@ -76,8 +75,7 @@ func (items Items) QueueDelete(item_ids []int64) {
 			Type: "item_delete",
 			UUID: uuid,
 			Args: map[string]interface{}{
-				"content": item_ids,
-				"ids":     item_ids,
+				"ids": item_ids,
 			},
 		},
 	}
