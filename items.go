@@ -190,6 +190,9 @@ func (items Items) AddNote(content string, item_id int64) (map[string]interface{
 	})
 	response, err := items.sync_object.callWriteApi(commands)
 	response_map := apiResponseToMap(response)
+	body := response_map["body"].(map[string]interface{})
+	id_mapping := body["temp_id_mapping"].(map[string]interface{})
+	response_map["note_id"] = id_mapping[temp_id]
 	defer response.Body.Close()
 	return response_map, err
 }

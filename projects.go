@@ -57,8 +57,7 @@ func (projects Projects) Delete(project_ids []int64) (map[string]interface{}, er
 			Type: "project_delete",
 			UUID: uuid,
 			Args: map[string]interface{}{
-				"content": project_ids,
-				"ids":     project_ids,
+				"ids": project_ids,
 			},
 		},
 	}
@@ -75,8 +74,7 @@ func (projects Projects) QueueDelete(project_ids []int64) {
 			Type: "project_delete",
 			UUID: uuid,
 			Args: map[string]interface{}{
-				"content": project_ids,
-				"ids":     project_ids,
+				"ids": project_ids,
 			},
 		},
 	}
@@ -168,6 +166,9 @@ func (projects Projects) AddNote(content string, project_id int64) (map[string]i
 	})
 	response, err := projects.sync_object.callWriteApi(commands)
 	response_map := apiResponseToMap(response)
+	body := response_map["body"].(map[string]interface{})
+	id_mapping := body["temp_id_mapping"].(map[string]interface{})
+	response_map["note_id"] = id_mapping[temp_id]
 	defer response.Body.Close()
 	return response_map, err
 }
