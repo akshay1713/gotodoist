@@ -1,4 +1,4 @@
-//Package gotodois is a library for interacting with the Todoist api
+//Package gotodoist is a library for interacting with the Todoist api
 package gotodoist
 
 import (

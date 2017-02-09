@@ -1,9 +1,15 @@
 package gotodoist
 
+//Items is the struct on which all the item(task) related api calls are made
 type Items struct {
 	sync_object *SyncObject
 }
 
+//Add adds new items to the given project.
+//Takes a slice of names and a project id as parameters.
+//Returns a map with the following keys-
+//body[body of the response], status[http status of the response],
+//name_ids[a map of the item names to the item ids]
 func (items Items) Add(names []string, project_id int64) (map[string]interface{}, error) {
 	commands := []Command{}
 	name_temp_ids := map[string]string{}
