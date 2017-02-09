@@ -80,7 +80,7 @@ func (projects Projects) Delete(project_ids []int64) (map[string]interface{}, er
 	return response_map, err
 }
 
-//QueueDelete queues delete command for the given project id.
+//QueueDelete queues delete command for the given project ids.
 //Projects will be deleted when the Commit function is called.
 //Takes a slice of project ids as parameter.
 func (projects Projects) QueueDelete(project_ids []int64) {

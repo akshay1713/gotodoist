@@ -12,12 +12,15 @@ import (
 	"net/url"
 )
 
+//TodoistAPI holds everything needed to interact with this library.
+//It is the gateway to this library. All external calls go through a variable of this type.
 type TodoistAPI struct {
 	Projects    Projects
 	Items       Items
 	sync_object *SyncObject
 }
 
+//SyncObject is used for directly interacting with the Sync API of Todoist.
 type SyncObject struct {
 	token       string
 	url         string
@@ -25,6 +28,7 @@ type SyncObject struct {
 	write_queue []Command
 }
 
+//Command is a type which is used for creating the parameters to be sent to the API.
 type Command struct {
 	Type   string                 `json:"type"`
 	UUID   string                 `json:"uuid"`
@@ -32,6 +36,7 @@ type Command struct {
 	Args   map[string]interface{} `json:"args"`
 }
 
+//callWriteApi is used while writing resources.
 func (sync SyncObject) callWriteApi(commands []Command) (*http.Response, error) {
 	sync_api_url := sync.url + "?token=" + sync.token
 	buf := new(bytes.Buffer)
@@ -43,6 +48,7 @@ func (sync SyncObject) callWriteApi(commands []Command) (*http.Response, error) 
 	return resp_new, err_new
 }
 
+//callReadApi is used while reading resources
 func (sync SyncObject) callReadApi(resource_types []string) (*http.Response, error) {
 	sync_api_url := sync.url + "?token=" + sync.token + "&sync_token=" + sync.sync_token
 	buf := new(bytes.Buffer)
@@ -54,12 +60,16 @@ func (sync SyncObject) callReadApi(resource_types []string) (*http.Response, err
 	return resp_new, err_new
 }
 
+//queueCommands queues the given commands to the write_queue
 func (sync *SyncObject) queueCommands(commands []Command) {
 	current_commands := sync.write_queue
 	updated_commands := append(current_commands, commands...)
 	sync.write_queue = updated_commands
 }
 
+//Commit executes all the commands currently queued in the write_queue type of SyncObject.
+//This is used to take advantage of the batched api calls feature provided by the Todoist API.
+//Multiple commands can be executed in a single HTTP call
 func (todoist_api *TodoistAPI) Commit() (map[string]interface{}, error) {
 	commands := todoist_api.sync_object.write_queue
 	response, err := todoist_api.sync_object.callWriteApi(commands)
@@ -71,6 +81,9 @@ func (todoist_api *TodoistAPI) Commit() (map[string]interface{}, error) {
 	return response_map, err
 }
 
+//InitTodoistAPI creates and returns an instance of a TodoistAPI struct.
+//This instance will be used for interacting with the API.
+//Takes a user auth token string as a parameter.
 func InitTodoistAPI(api_token string) TodoistAPI {
 	commands := []Command{}
 	sync_object := SyncObject{api_token, "https://todoist.com/API/v7/sync", "*", commands}
@@ -80,6 +93,8 @@ func InitTodoistAPI(api_token string) TodoistAPI {
 	return todoist_api
 }
 
+//apiResponseToMap converts the response from TodoistAPI to a map containing the keys
+//body(body of response) and status(http status of response)
 func apiResponseToMap(response *http.Response) map[string]interface{} {
 	response_body, _ := ioutil.ReadAll(response.Body)
 	response_body_map := make(map[string]interface{})

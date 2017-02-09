@@ -40,6 +40,9 @@ func (items Items) Add(names []string, project_id int64) (map[string]interface{}
 	return response_map, err
 }
 
+//QueueAdd queues an item add command for the given names.
+//The items will be added when the Commit function is called.
+//Takes a slice of item names as parameter.
 func (items *Items) QueueAdd(names []string) {
 	commands := []Command{}
 	for _, name := range names {
@@ -57,6 +60,10 @@ func (items *Items) QueueAdd(names []string) {
 	items.sync_object.queueCommands(commands)
 }
 
+//Delete deletes an item
+//Takes a slice of item ids (int64) as parameter.
+//Returns a map with the following keys-
+//body[body of the response], status[http status of the response],
 func (items Items) Delete(item_ids []int64) (map[string]interface{}, error) {
 	uuid, _ := newUUID()
 	commands := []Command{
@@ -74,6 +81,9 @@ func (items Items) Delete(item_ids []int64) (map[string]interface{}, error) {
 	return response_map, err
 }
 
+//QueueDelete queues delete command for the given item ids
+//Projects will be deleted when the Commit function is called.
+//Takes a slice of item ids as parameter.
 func (items Items) QueueDelete(item_ids []int64) {
 	uuid, _ := newUUID()
 	commands := []Command{
@@ -88,6 +98,10 @@ func (items Items) QueueDelete(item_ids []int64) {
 	items.sync_object.queueCommands(commands)
 }
 
+//Complete completes the items with the given item ids.
+//Takes a slice of item ids (int64) as parameter.
+//Returns a map with the following keys-
+//body[body of the response], status[http status of the response],
 func (items Items) Complete(item_ids []int64) (map[string]interface{}, error) {
 	uuid, _ := newUUID()
 	commands := []Command{
@@ -105,6 +119,8 @@ func (items Items) Complete(item_ids []int64) (map[string]interface{}, error) {
 	return response_map, err
 }
 
+//QueueUncomplete queues item complete command for the given item ids.
+//Takes a slice of item ids (int64) as parameter.
 func (items Items) QueueComplete(item_ids []int64) {
 	uuid, _ := newUUID()
 	commands := []Command{
@@ -119,6 +135,10 @@ func (items Items) QueueComplete(item_ids []int64) {
 	items.sync_object.queueCommands(commands)
 }
 
+//Uncomplete uncompletes the items with the given item ids.
+//Takes a slice of item ids (int64) as parameter.
+//Returns a map with the following keys-
+//body[body of the response], status[http status of the response],
 func (items Items) Uncomplete(item_ids []int64) (map[string]interface{}, error) {
 	uuid, _ := newUUID()
 	commands := []Command{
@@ -136,6 +156,8 @@ func (items Items) Uncomplete(item_ids []int64) (map[string]interface{}, error) 
 	return response_map, err
 }
 
+//QueueUncomplete queues item uncomplete command for the given item ids.
+//Takes a slice of item ids (int64) as parameter.
 func (items Items) QueueUncomplete(item_ids []int64) {
 	uuid, _ := newUUID()
 	commands := []Command{
@@ -150,6 +172,10 @@ func (items Items) QueueUncomplete(item_ids []int64) {
 	items.sync_object.queueCommands(commands)
 }
 
+//Close closes an item with the given id.
+//Takes an item id (int64) as parameter.
+//Returns a map with the following keys-
+//body[body of the response], status[http status of the response],
 func (items Items) Close(item_id int64) (map[string]interface{}, error) {
 	uuid, _ := newUUID()
 	commands := []Command{
@@ -167,6 +193,8 @@ func (items Items) Close(item_id int64) (map[string]interface{}, error) {
 	return response_map, err
 }
 
+//QueueClose queues an item close command for the given item id.
+//Takes an item id (int64) as parameter.
 func (items Items) QueueClose(item_id int64) {
 	uuid, _ := newUUID()
 	commands := []Command{
@@ -181,6 +209,11 @@ func (items Items) QueueClose(item_id int64) {
 	items.sync_object.queueCommands(commands)
 }
 
+//AddNote adds a item note.
+//Takes a string of note content and item id as parameters.
+//Returns a map with the following keys-
+//body[body of the response], status[http status of the response],
+//note_id[id of the newly created note]
 func (items Items) AddNote(content string, item_id int64) (map[string]interface{}, error) {
 	commands := []Command{}
 	uuid, _ := newUUID()
@@ -203,6 +236,8 @@ func (items Items) AddNote(content string, item_id int64) (map[string]interface{
 	return response_map, err
 }
 
+//QueueAddNote queues an add note command.
+//Takes a string of note content and item id as parameter.
 func (items Items) QueueAddNote(content string, item_id int64) {
 	commands := []Command{}
 	uuid, _ := newUUID()
@@ -219,6 +254,9 @@ func (items Items) QueueAddNote(content string, item_id int64) {
 	items.sync_object.queueCommands(commands)
 }
 
+//GetAll returns all the existing items.
+//Returns a map with the following keys-
+//body[body of the response], status[http status of the response],
 func (items Items) GetAll() (map[string]interface{}, error) {
 	resource_types := []string{"items"}
 	response, err := items.sync_object.callReadApi(resource_types)
